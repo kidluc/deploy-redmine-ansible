@@ -1,0 +1,107 @@
+---
+  - name: Make a redmine directory
+    file:
+      path: "{{ nginx_link }}"
+      state: directory
+      mode: "{{ mode }}"
+
+  - name: Download redmine
+    subversion:
+      repo: https://svn.redmine.org/redmine/branches/{{ redmine_version }}-stable
+      dest: "{{ redmine }}"
+
+  - name: Copy config
+    template:
+      src: configuration.yml.j2
+      dest: "{{ redmine_config }}"
+      mode: "{{ mode2 }}"
+
+  - name: Copy database
+    copy:
+      src: database.yml
+      dest: "{{ redmine_db }}"
+      mode: "{{ mode2 }}"
+
+  - name: make tmp dir
+    file:
+      path: "{{ tmp }}"
+      state: directory
+
+  - name: make pdf dir
+    file:
+      path: "{{ pdf }}"
+      state: directory
+
+  - name: make plugin_assets
+    file:
+      path: "{{ plugin_assets }}"
+      state: directory
+
+  - name: change owner
+    file:
+      path: "{{ files }}"
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+
+  - name: change owner2
+    file:
+      path: "{{ log }}"
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+
+  - name: change owner3
+    file:
+      path: "{{ tmp }}"
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+
+  - name: change owner4
+    file:
+      path: "{{ plugin_assets }}"
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+      
+  - name: change owner5
+    file:
+      path: "{{ public }}"
+      owner: "{{ owner }}"
+      group: "{{ group }}"
+
+  - name: change mod
+    file:
+      path: "{{ files }}"
+      mode: "{{ mode }}"
+
+  - name: change mod2
+    file:
+      path: "{{ log }}"
+      mode: "{{ mode }}"
+
+  - name: change mod3
+    file:
+      path: "{{ tmp }}"
+      mode: "{{ mode }}"
+
+  - name: change mode4
+    file:
+      path: "{{ plugin_assets }}"
+      mode: "{{ mode }}"
+
+#  - name: install bundler
+#    shell: gem install bundler
+
+  - name: Install bundler by gem
+    gem:
+      name: bundler
+      state: present
+
+
+  - name: gem dependencies
+    command: bundle install --without development test
+    args:
+      chdir: "{{ redmine }}"
+
+  - name: gen a token and database
+    command: bundle exec rake generate_secret_token
+    args:
+      chdir: "{{ redmine }}"

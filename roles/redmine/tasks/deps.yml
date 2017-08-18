@@ -1,0 +1,82 @@
+---
+  # DEPS
+  - name: Add MySQL5.6 Repo
+    apt_repository:
+      repo: deb http://archive.ubuntu.com/ubuntu trusty universe
+      state: present
+    notify:
+      - UPDATE
+
+  - name: Install MySQL5.6
+    apt: name={{ item }} state=present
+    with_items:
+      - mysql-server-5.6
+      - mysql-client-5.6
+
+  - name: Start MySQL
+    service: name=mysql state=started enabled=yes
+
+  - name: Install Redmine Deps
+    apt: name={{ item }} state=present
+    with_items:
+      - libmysqlclient-dev
+      - imagemagick
+      - libmagickwand-dev
+      - libcurl4-openssl-dev
+      - git-core
+      - git
+      - subversion
+      - libssl-dev
+      - ruby-dev
+      - curl
+      - python-pip
+      - python-mysqldb
+    notify:
+      - UPDATE
+
+  - name: Create amree to run source
+    file:
+      path: /home/amree
+      state: directory
+
+  - name: Install Python-Mysql module
+    pip: name=MySQL-python
+
+  # RUBY
+  - name: Add Key ruby & RVM
+    apt_key:
+      state: present
+      keyserver: "{{ key_server }}"
+      id: "{{ id }}"
+
+  - name: Install RVM
+    shell: curl -sSL "{{ url }}" | sudo bash -s stable
+  
+  - name: Change the .bashrc from root/.bashrc to /home/amree/.bashrc
+    copy:
+      src: "{{ source }}"
+      dest: "{{ source_amree }}"
+      owner: "{{ owner_root }}"
+      group: "{{ owner_root }}"
+      mode: "{{ mode2 }}"
+
+  - name: Reload RVM
+    shell: . "{{ rvm }}"
+    become: true
+
+  - name: Add to .bashrc
+    #lineinfile: dest=/home/amree/.bashrc line="[[ -s ""{{ rvm }}"" ]] && source ""{{ rvm }}"""
+    shell: echo '[[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"' >> ~/.bashrc
+
+  # MYSQL 
+  - name: Create a redmine database
+    mysql_db:
+      name: "{{ redmine_db_name }}"
+      encoding: utf8
+
+  - name: Create redmine user
+    mysql_user:
+      name: "{{ redmine_db_name }}"
+      password: "{{ redmine_db_name }}"
+      priv: '*.*:ALL,GRANT'
+      state: present

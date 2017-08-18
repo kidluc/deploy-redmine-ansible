@@ -1,0 +1,5 @@
+---
+  - include: deps.yml
+  - include: passenger.yml
+  - include: redmine.yml
+  - include: bundle.yml

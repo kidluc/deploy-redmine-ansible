@@ -1,0 +1,35 @@
+---
+  # SET UP NGINX AND PASSENGER
+  - name: Install passenger using gem
+    command: gem install passenger --no-ri --no-rdoc
+
+  - name: Setting nginx
+    command: passenger-install-nginx-module
+
+  - name: Config nginx
+    copy:
+      src: nginx.conf
+      dest: "{{ nginx_config }}"
+      mode: "{{ mode2 }}"
+
+  - name: make file vhost
+    file:
+      path: "{{ vhost }}"
+      state: directory
+      mode: "{{ mode }}"
+#    shell: mkdir -p "{{ vhost }}"
+
+  - name: Config virtual host config file
+    template:
+      src: redmine.conf.j2
+      dest: "{{ redmine_host_config }}"
+      mode: 0644
+
+  - name: config nginx systemd
+    template:
+      src: nginx.service.j2
+      dest: "{{ nginx_service }}"
+      mode: 0644
+    notify:
+      - RELOAD
+      - NGINX START

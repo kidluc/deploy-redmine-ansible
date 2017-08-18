@@ -1,0 +1,52 @@
+---
+  # Redmine
+  redmine_db_name: redmine
+  redmine_db_pass: redmine
+  redmine_host_config: /opt/nginx/conf/vhost/redmine.conf
+  redmine: /var/www/redmine
+  redmine_version: 3.2
+  redmine_config: /var/www/redmine/config/configuration.yml
+  redmine_db: /var/www/redmine/config/database.yml
+  
+  # Nginx
+  nginx_config: /opt/nginx/conf/nginx.conf
+  vhost: /opt/nginx/conf/vhost
+  vhost_vhost_config: vhost/*.conf
+  nginx_service: /lib/systemd/system/nginx.service
+  nginx_link: /var/www
+  
+  # Passenger
+  passenger: /var/lib/gems/2.3.0/gems/passenger-5.1.7
+  ruby: /usr/bin/ruby2.3
+  port: 80
+  local: localhost
+  root: /var/www/redmine/public
+
+  # Files
+  tmp: /var/www/redmine/tmp
+  pdf: /var/www/redmine/tmp/pdf
+  plugin_assets: /var/www/redmine/public/plugin_assets
+  files: /var/www/redmine/files
+  log: /var/www/redmine/log
+  public: /var/www/redmine/public
+
+  # Templates
+  mode: 0775
+  mode2: 0644
+  adapter: mysql2
+  name: redmine
+  host: localhost
+  encode: utf8
+  
+  # Ruby
+  key_server: hkp://keys.gnupg.net
+  id: D39DC0E3
+  url: https://raw.githubusercontent.com/wayneeseguin/rvm/stable/binscripts/rvm-installer
+  source: /root/.bashrc
+  source_amree: /home/amree/.bashrc
+  rvm: /usr/local/rvm/scripts/rvm
+
+  # Owner and Group
+  owner_root: root
+  owner: www-data
+  group: www-data
